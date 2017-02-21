@@ -18,23 +18,28 @@ platforms:
       image: centos:6.8
       pid_one_command: /sbin/init
       intermediate_instructions:
+        - RUN yum install -y yum-plugin-ovl # overlayfs fix
         - RUN /usr/bin/yum install -y sudo
+        
   - name: centos-7
     driver:
       image: centos:7.2.1511
       privileged: true
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
-        - RUN /usr/bin/yum install -y sudo
+        - RUN yum install -y yum-plugin-ovl # overlayfs fix
+        - RUN /usr/bin/yum install -y sudo 
+        
   - name: ubuntu-14.04
     driver:
       image: ubuntu-upstart:14.04
       pid_one_command: /sbin/init
       intermediate_instructions:
         - RUN /usr/bin/apt-get update
-        - RUN /usr/bin/apt-get install -y sudo openssh-client
-      run_list:
-        - recipe[apt]
+        - RUN /usr/bin/apt-get -y install net-tools apt-transport-https
+        - RUN /usr/bin/apt-get -y install openssh-client # should be in cookbook
+        - RUN /usr/bin/apt-get -y install sudo # for serverspec
+        
   - name: ubuntu-16.04
     driver:
       image: ubuntu:16.04
@@ -42,6 +47,7 @@ platforms:
       pid_one_command: /lib/systemd/systemd
       intermediate_instructions:
         - RUN /usr/bin/apt-get update
-        - RUN /usr/bin/apt-get install -y sudo openssh-client
-      run_list:
-        - recipe[apt]
+        - RUN /usr/bin/apt-get -y install net-tools apt-transport-https
+        - RUN /usr/bin/apt-get -y install openssh-client # should be in cookbook
+        - RUN /usr/bin/apt-get -y install sudo # for serverspec
+        - RUN /usr/bin/apt-get -y install upstart # cookbook bug
